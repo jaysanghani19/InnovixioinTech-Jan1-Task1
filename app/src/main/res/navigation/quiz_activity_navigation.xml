@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/quiz_activity_navigation"
+    app:startDestination="@id/quizFragment">
+
+    <fragment
+        android:id="@+id/quizFragment"
+        android:name="com.jay.quiz.quizactivity.quizfragment.QuizFragment"
+        android:label="QuizFragment" >
+        <action
+            android:id="@+id/action_quizFragment_to_addQuestion"
+            app:destination="@id/addQuestion" />
+        <argument
+            android:name="quiz_name"
+            app:argType="string"
+            android:defaultValue="quiz" />
+    </fragment>
+    <fragment
+        android:id="@+id/addQuestion"
+        android:name="com.jay.quiz.quizactivity.addquestion.AddQuestion"
+        android:label="AddQuestion" >
+        <action
+            android:id="@+id/action_addQuestion_to_quizFragment"
+            app:destination="@id/quizFragment" />
+    </fragment>
+</navigation>
