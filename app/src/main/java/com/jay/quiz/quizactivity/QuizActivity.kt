@@ -26,8 +26,6 @@ class QuizActivity : AppCompatActivity() {
         bundle.apply {
             bundle.putString(QUIZ_NAME_KEY,quiz)
         }
-        Log.i("Activity", "onCreateView: ${quiz}")
-
 
         val quizFragment = QuizFragment()
         quizFragment.arguments=bundle

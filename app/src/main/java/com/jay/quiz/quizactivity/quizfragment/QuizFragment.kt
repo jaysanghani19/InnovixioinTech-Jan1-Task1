@@ -22,6 +22,7 @@ import com.jay.quiz.adapters.QuestionAdapter
 import com.jay.quiz.adapters.QuizAdapter
 import com.jay.quiz.databinding.AddQuestionFragmentBinding
 import com.jay.quiz.quizactivity.QuizActivity
+import com.jay.quiz.quizactivity.playfragment.PlayFragment
 import com.jay.quiz.roomdatabase.QuestionTable
 import com.jay.quiz.roomdatabase.QuestionTableDao
 import com.jay.quiz.roomdatabase.QuizDatabase
@@ -35,29 +36,36 @@ class QuizFragment : Fragment() {
 
     private lateinit var questionDao: QuestionTableDao
 
+    private var isQuestionsAreSet = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.quiz_fragment, container, false)
+        init()
+        return binding.root
+    }
+
+    private fun init() {
         val quizName = arguments?.getString(QuizActivity.QUIZ_NAME_KEY)
         questionDao = QuizDatabase.getInstance(requireContext())?.getQuestionDao()!!
 
         setQuestionRecyclerView(quizName!!)
 
-        Log.i("Fragment", "onCreateView: ${quizName}")
 
         binding.title.text = quizName
         binding.addButton.setOnClickListener {
             clickListenerOfAddButton(quizName!!)
         }
-        return binding.root
+
+        binding.playButton.setOnClickListener {
+            clickListenerOfPlayButton(quizName!!)
+        }
     }
 
     private fun setQuestionRecyclerView(quizName: String) {
-        Log.i("Fragment", "onCreateView: ${quizName}")
-
         viewLifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 val questions = questionDao.getQuestionOfTheQuiz(quizName)
@@ -65,9 +73,8 @@ class QuizFragment : Fragment() {
                     binding.questionsRecyclerView.layoutManager =
                         LinearLayoutManager(requireContext())
                     questions.observe(viewLifecycleOwner) { it ->
-
-                        it.forEach {
-                            Log.i("options", "${it.option1} ${it.option2}  ${it.option3}  ${it.option4}")
+                        if (it.size>0){
+                            isQuestionsAreSet = true
                         }
                         binding.questionsRecyclerView.adapter = QuestionAdapter(it)
                     }
@@ -79,6 +86,25 @@ class QuizFragment : Fragment() {
 
     private fun clickListenerOfAddButton(quizName: String) {
         showAddDialog(quizName)
+    }
+
+    private fun clickListenerOfPlayButton(quizName: String) {
+        if (isQuestionsAreSet) {
+            var playFragment = PlayFragment()
+            val bundle = Bundle()
+            bundle.apply {
+                bundle.putString(QuizActivity.QUIZ_NAME_KEY, quizName)
+            }
+            playFragment.arguments = bundle
+            replaceFragment(playFragment)
+        } else{
+            Toast.makeText(requireContext(), "Add Questions", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.quiz_activity_fragment_frame, fragment).commit()
     }
 
     private fun showAddDialog(quizName: String) {
@@ -137,7 +163,7 @@ class QuizFragment : Fragment() {
                                 answerOption
                             )
                             questionDao.insertQuestion(question)
-                            withContext(Dispatchers.Main){
+                            withContext(Dispatchers.Main) {
                                 dialog.dismiss()
                             }
                         }
@@ -145,7 +171,7 @@ class QuizFragment : Fragment() {
                 }
             }
         }
-       dialog.show()
+        dialog.show()
 
     }
 }

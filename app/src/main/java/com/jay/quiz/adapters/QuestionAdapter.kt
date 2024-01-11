@@ -1,5 +1,6 @@
 package com.jay.quiz.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,6 +41,5 @@ class QuestionViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         option2TV.text = "B. ${question.option2}"
         option3TV.text = "C. ${question.option3}"
         option4TV.text = "D. ${question.option4}"
-
     }
 }
